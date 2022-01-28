@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrescriptionTracker", "PrescriptionTracker\PrescriptionTracker.csproj", "{D8DD49C4-3748-4D82-9013-743C8353BD29}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D8DD49C4-3748-4D82-9013-743C8353BD29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8DD49C4-3748-4D82-9013-743C8353BD29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8DD49C4-3748-4D82-9013-743C8353BD29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8DD49C4-3748-4D82-9013-743C8353BD29}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A106124D-A9AC-4CC1-8B43-613CA23084D2}
+	EndGlobalSection
+EndGlobal
