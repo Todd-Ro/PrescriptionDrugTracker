@@ -23,10 +23,10 @@ namespace PrescriptionDrugTracker.Models
             };*/
 
         public string DrugName { get; set; }
-        public int Tier {get; set;}
-        public Guid Id;
-        static int NextId = 0;
-        int DrugId;
+        public int Tier { get; set; }
+        public Guid Id { get; set; }
+        internal protected static int NextId { get; set; } = 0;
+        //public int DrugId { get; set; }
 
         public static bool DrugsInitialized { get; set; } = false;
 
@@ -43,7 +43,7 @@ namespace PrescriptionDrugTracker.Models
             DrugName = drugName;
             Tier = tier;
             Id = GuidMethods.makeId(NextId);
-            DrugId = Drug.GetDrugIdByName(drugName);
+            //DrugId = Drug.GetDrugIdByName(drugName);
             NextId++;
         }
 

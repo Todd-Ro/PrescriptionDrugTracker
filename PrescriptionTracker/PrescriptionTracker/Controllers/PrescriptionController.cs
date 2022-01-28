@@ -1,14 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PrescriptionDrugTracker.Models;
 using PrescriptionDrugTrackerImplemented.Models;
+using PrescriptionTracker.Data;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PrescriptionDrugTracker.Controllers
 {
     public class PrescriptionController : Controller
     {
         List<Drug> AllDrugs;
+        private PrescriptionDbContext pContext;
+
+        public PrescriptionController(PrescriptionDbContext pDbContext)
+        {
+            pContext = pDbContext;
+        }
 
         public IActionResult Index()
         {
@@ -16,6 +24,8 @@ namespace PrescriptionDrugTracker.Controllers
             {
                 GenerateAllDrugs();
             }
+            /*Since this is based on a backend list in drugs and does not need to persist user 
+             * input, it does not need to use the DbContext.*/
             ViewBag.druglist = AllDrugs;
             return View();
         }
@@ -49,6 +59,8 @@ namespace PrescriptionDrugTracker.Controllers
                 {
                     SelectedDrugs.Add(SelectedDrug);
                     SelectedDrugIds.Add(selectedDrugId);
+                    pContext.Add(SelectedDrug);
+                    pContext.SaveChanges();
                 }
             }
             if(!(drugnames is null))
@@ -64,10 +76,12 @@ namespace PrescriptionDrugTracker.Controllers
                     {
                         SelectedDrugs.Add(SelectedDrug);
                         SelectedDrugIds.Add(selectedDrugId);
+                        pContext.Add(SelectedDrug);
                     }
                 }
+                pContext.SaveChanges();
             }
-            ViewBag.mydruglist = SelectedDrugs;
+            ViewBag.mydruglist = pContext.PrescriptionSet.ToList();
             return View();
         }
 
@@ -111,6 +125,7 @@ namespace PrescriptionDrugTracker.Controllers
             {
                 GenerateAllDrugs();
             }
+            //Simply a list of medications, regardless of whether they have been selected
             ViewBag.druglist = AllDrugs;
             return View();
         }
