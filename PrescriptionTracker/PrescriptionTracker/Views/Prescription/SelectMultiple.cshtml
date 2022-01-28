@@ -1,0 +1,18 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<h1>Select Multiple Medications to add</h1>
+
+<form method='post' action='/prescription/myselected'>
+    <select name='drugname' id='drugname'>
+        @foreach(var p in ViewBag.druglist)
+        {
+            <option value='@p.DrugName'>@p.DrugName</option>
+        }
+    </select>
+    <br />
+    <input type='submit' value='Submit' />
+</form>

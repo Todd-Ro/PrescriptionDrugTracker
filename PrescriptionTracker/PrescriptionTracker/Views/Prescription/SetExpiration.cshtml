@@ -1,0 +1,21 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<h1>Input Refill Information</h1>
+<h2>Selected medication: @ViewBag.drugname</h2>
+
+<form method='post' action='/prescription/processsetexpiration/@ViewBag.drugname'>
+    <label for='lastfilled'>Date last filled: </label>
+    <input type='date' id='lastfilled' name='lastfilled'/>
+    <br />
+    
+    <label for='daysoffill'>Days' supply obtained at last fill: </label>
+    <input type='number' id='daysoffill' name='daysoffill'/>
+
+
+
+    <input type="submit" value="Submit">
+</form>

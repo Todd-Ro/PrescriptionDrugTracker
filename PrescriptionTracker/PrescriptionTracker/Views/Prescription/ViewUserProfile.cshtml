@@ -1,0 +1,18 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<table>
+    <tr>
+        <th>Medicine: </th>
+        <th>Supply available until: </th>
+    </tr>
+    @for(int i=0; i<ViewBag.usermeds.Count; i++) {
+        <tr>
+            <th>@ViewBag.usermeds[i] &nbsp;&nbsp;</th>
+            <th>@ViewBag.userexpiries[i]</th>
+        </tr>
+    }
+</table>

@@ -1,0 +1,32 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<h1>My Medications</h1>
+
+<table class='table'>
+    <tr>
+        <th>Name of Medication</th>
+        <th>Tier (1-3; lower is cheaper)</th>
+        <th>Set Refill Information</th>
+    </tr>
+    @foreach(var p in ViewBag.mydruglist)
+    {
+        <tr>
+            <th>@p.DrugName</th>
+            <th>@p.Tier</th>
+            <th><a asp-controller="Prescription" asp-action="SetExpiration"
+            asp-route-drugname="@p.DrugName"> 
+                Set expiration information</a></th>
+        </tr>
+    }
+</table>
+
+<a asp-controller="Prescription" asp-action="SelectMeds">
+    Select another medication</a>
+<br /><br />
+
+<a asp-controller="Prescription" asp-action="ViewUserProfile">
+    See my expiration information</a>
