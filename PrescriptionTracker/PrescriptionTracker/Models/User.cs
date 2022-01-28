@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PrescriptionDrugTrackerImplemented.Models
+namespace PrescriptionDrugTracker.Models
 {
     public class User
     {

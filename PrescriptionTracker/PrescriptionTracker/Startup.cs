@@ -34,9 +34,9 @@ namespace PrescriptionTracker
             //Add another services.AddDbContext line for our model class DbContext
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddDbContext<PrescriptionDbContext>(options =>
+            /*services.AddDbContext<PrescriptionDbContext>(options =>
                 options.UseMySql(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    Configuration.GetConnectionString("DefaultConnection")));*/
             services.AddRazorPages();
         }
 

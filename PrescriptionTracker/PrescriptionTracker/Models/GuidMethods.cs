@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 
-namespace PrescriptionDrugTrackerImplemented.Models
+namespace PrescriptionDrugTracker.Models
 {
     public static class GuidMethods
     {

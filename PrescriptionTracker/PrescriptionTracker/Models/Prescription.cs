@@ -1,4 +1,5 @@
-﻿using PrescriptionDrugTrackerImplemented.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using PrescriptionDrugTracker.Models;
 using System;
 using System.Collections.Generic;
 
@@ -25,8 +26,18 @@ namespace PrescriptionDrugTracker.Models
         public string DrugName { get; set; }
         public int Tier { get; set; }
         public Guid Id { get; set; }
+
+        public int TheDrugPrescribedId { get; set; }
+        public Drug TheDrugPrescribed { get; set; }
+
+        public string PatientId { get; set; }
+        public IdentityUser Patient { get; set; }
+
         internal protected static int NextId { get; set; } = 0;
-        //public int DrugId { get; set; }
+
+
+        //TODO: Make Expiration information that is set after construction
+        
 
         public static bool DrugsInitialized { get; set; } = false;
 
@@ -43,7 +54,7 @@ namespace PrescriptionDrugTracker.Models
             DrugName = drugName;
             Tier = tier;
             Id = GuidMethods.makeId(NextId);
-            //DrugId = Drug.GetDrugIdByName(drugName);
+            TheDrugPrescribedId = Drug.GetDrugIdByName(drugName);
             NextId++;
         }
 

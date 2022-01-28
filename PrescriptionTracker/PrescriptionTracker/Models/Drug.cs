@@ -1,7 +1,7 @@
 ﻿using PrescriptionDrugTracker.Models;
 using System.Collections.Generic;
 
-namespace PrescriptionDrugTrackerImplemented.Models
+namespace PrescriptionDrugTracker.Models
 {
     public class Drug
     {
@@ -60,7 +60,7 @@ namespace PrescriptionDrugTrackerImplemented.Models
 
         public string DrugName { get; set; }
         public int Tier { get; set; }
-        int Id;
+        public int Id { get; set; }
         public static List<Drug> AllDrugs { get; set; }
         public static string GetDrugNameById(int drugId)
         {

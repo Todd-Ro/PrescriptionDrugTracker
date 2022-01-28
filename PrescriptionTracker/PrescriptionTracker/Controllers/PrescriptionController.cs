@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PrescriptionDrugTracker.Models;
-using PrescriptionDrugTrackerImplemented.Models;
 using PrescriptionTracker.Data;
 using System;
 using System.Collections.Generic;
@@ -11,9 +10,9 @@ namespace PrescriptionDrugTracker.Controllers
     public class PrescriptionController : Controller
     {
         List<Drug> AllDrugs;
-        private PrescriptionDbContext pContext;
+        private ApplicationDbContext pContext;
 
-        public PrescriptionController(PrescriptionDbContext pDbContext)
+        public PrescriptionController(ApplicationDbContext pDbContext)
         {
             pContext = pDbContext;
         }
