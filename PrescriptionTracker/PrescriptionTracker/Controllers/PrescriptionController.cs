@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PrescriptionDrugTracker.Models;
 using PrescriptionTracker.Data;
+using PrescriptionTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,17 +30,9 @@ namespace PrescriptionDrugTracker.Controllers
             return View();
         }
 
-        [HttpGet]
-        public IActionResult SelectMeds()
-        {
-            if (AllDrugs is null)
-            {
-                GenerateAllDrugs();
-            }
-            ViewBag.druglist = AllDrugs;
-            return View();
-        }
 
+
+        //This List ultimately needs to be replaced with the prescriptions for the current user
         static List<Prescription> SelectedDrugs = new List<Prescription>();
         static List<int> SelectedDrugIds = new List<int>();
 
@@ -47,42 +40,55 @@ namespace PrescriptionDrugTracker.Controllers
         [HttpPost]
         public IActionResult MySelected(string drugname, string[] drugnames)
         {
-            if(!(drugname is null))
-            {
-                Prescription SelectedDrug = new Prescription(drugname,
-                Prescription.GetDrugLibrary()[drugname]);
-                int selectedDrugId = Drug.GetDrugIdByName(drugname);
-
-                //This logic depends on how equals method works
-                if (!(SelectedDrugIds.Contains(selectedDrugId)))
-                {
-                    SelectedDrugs.Add(SelectedDrug);
-                    SelectedDrugIds.Add(selectedDrugId);
-                    pContext.Add(SelectedDrug);
-                    pContext.SaveChanges();
-                }
-            }
-            if(!(drugnames is null))
-            {
-
-                foreach(string drug in drugnames)
-                {
-                    //TODO: Ensure this works if equality is based on Id
-                    Prescription SelectedDrug = new Prescription(drug,
-                    Prescription.GetDrugLibrary()[drug]);
-                    int selectedDrugId = Drug.GetDrugIdByName(drugname);
-                    if (!(SelectedDrugIds.Contains(selectedDrugId)))
-                    {
-                        SelectedDrugs.Add(SelectedDrug);
-                        SelectedDrugIds.Add(selectedDrugId);
-                        pContext.Add(SelectedDrug);
-                    }
-                }
-                pContext.SaveChanges();
-            }
+            //TODO: Ensure that only the current user's drugs are included
             ViewBag.mydruglist = pContext.PrescriptionSet.ToList();
             return View();
         }
+
+        [HttpGet]
+        public IActionResult SelectMeds()
+        {
+            pContext.InitializeDrugLibrary();
+            AddPrescriptionViewModel addPrescriptionViewModel =
+                new AddPrescriptionViewModel(pContext.DrugSet.ToList());
+            ViewBag.mydruglist = pContext.PrescriptionSet.ToList();
+            return View(addPrescriptionViewModel);
+        }
+
+        [HttpPost]
+        public IActionResult SelectMeds(Prescription newPrescription, 
+            AddPrescriptionViewModel addPrescriptionViewModel)
+        {
+            pContext.InitializeDrugLibrary();
+
+            if (ModelState.IsValid)
+            {
+                Drug prescribedDrug = pContext.DrugSet.Find(newPrescription.TheDrugPrescribedId);
+                newPrescription.DrugName = prescribedDrug.DrugName;
+                newPrescription.Tier = prescribedDrug.Tier;
+
+                List<Prescription> alreadyPrescribedSameDrug = pContext.PrescriptionSet
+                    .Where(presc => presc.TheDrugPrescribedId == newPrescription.TheDrugPrescribedId)
+                    //.Where(presc => presc.PatientId.Equals(newPrescription.PatientId))
+                    .ToList();
+
+                if (alreadyPrescribedSameDrug.Count == 0)
+                {
+                    SelectedDrugs.Add(newPrescription);
+                    SelectedDrugIds.Add(newPrescription.TheDrugPrescribedId);
+                    pContext.Add(newPrescription);
+                    pContext.SaveChanges();
+                }
+
+                return Redirect("/Prescription/MySelected");
+            }
+            else
+            {
+                return View(addPrescriptionViewModel);
+            }
+        }
+
+
 
         static User DefaultUser = new User();
         static User CurrentUser = DefaultUser;
@@ -131,6 +137,7 @@ namespace PrescriptionDrugTracker.Controllers
 
         public List<Drug> GenerateAllDrugs()
         {
+            pContext.InitializeDrugLibrary();
             List<Drug> ret = Drug.InitializeDrugs();
             AllDrugs = ret;
             return ret;

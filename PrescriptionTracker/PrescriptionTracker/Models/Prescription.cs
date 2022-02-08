@@ -25,7 +25,8 @@ namespace PrescriptionDrugTracker.Models
 
         public string DrugName { get; set; }
         public int Tier { get; set; }
-        public Guid Id { get; set; }
+        public int Id { get; set; }
+        public Guid ExtendedIdent { get; set; }
 
         public int TheDrugPrescribedId { get; set; }
         public Drug TheDrugPrescribed { get; set; }
@@ -33,7 +34,8 @@ namespace PrescriptionDrugTracker.Models
         public string PatientId { get; set; }
         public IdentityUser Patient { get; set; }
 
-        internal protected static int NextId { get; set; } = 0;
+        public static int StarterIndex { get; } = 1;
+        internal static int NextId { get; set; } = StarterIndex;
 
 
         //TODO: Make Expiration information that is set after construction
@@ -47,27 +49,40 @@ namespace PrescriptionDrugTracker.Models
             return Drug.GetDrugLibrary();
         }
 
-
-
-        public Prescription(string drugName, int tier)
-        {
-            DrugName = drugName;
-            Tier = tier;
-            Id = GuidMethods.makeId(NextId);
-            TheDrugPrescribedId = Drug.GetDrugIdByName(drugName);
-            NextId++;
-        }
-
         public override bool Equals(object obj)
         {
             return obj is Prescription prescription &&
-                   Id.Equals(prescription.Id);
+                   Id == prescription.Id &&
+                   ExtendedIdent.Equals(prescription.ExtendedIdent);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Id);
+            return HashCode.Combine(Id, ExtendedIdent);
         }
+
+        public Prescription()
+        {
+            if (Id == 0)
+            {
+                ExtendedIdent = GuidMethods.makeId(NextId);
+            }
+            else
+            {
+                ExtendedIdent = GuidMethods.makeId(Id);
+            }
+        }
+
+        public Prescription(string drugName, int tier): this()
+        {
+            DrugName = drugName;
+            Tier = tier;
+            
+            TheDrugPrescribedId = Drug.GetDrugIdByName(drugName);
+            NextId++;
+        }
+
+
 
 
 

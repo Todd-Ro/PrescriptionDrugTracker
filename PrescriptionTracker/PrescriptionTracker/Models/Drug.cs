@@ -21,6 +21,8 @@ namespace PrescriptionDrugTracker.Models
                 {"Provastatin", 1 }
         };
 
+        public static int LibraryCount { get; set; } = DrugLibrary.Count;
+
         public static Dictionary<string, int> GetDrugLibrary()
         {
             return DrugLibrary;
@@ -61,6 +63,7 @@ namespace PrescriptionDrugTracker.Models
         public string DrugName { get; set; }
         public int Tier { get; set; }
         public int Id { get; set; }
+
         public static List<Drug> AllDrugs { get; set; }
         public static string GetDrugNameById(int drugId)
         {
@@ -87,6 +90,8 @@ namespace PrescriptionDrugTracker.Models
             return ret;
         }
         */
+
+        public Drug() { }
 
         public Drug(string drugName, int tier)
         {

@@ -4,15 +4,20 @@
 @{
 }
 
+@using PrescriptionTracker.ViewModels;
+@model AddPrescriptionViewModel;
+
 <h1>Select Medication to add</h1>
 
-<form method='post' action='/prescription/myselected'>
-    <select name='drugname' id='drugname'>
-        @foreach(var p in ViewBag.druglist)
-        {
-            <option value='@p.DrugName'>@p.DrugName</option>
-        }
-    </select>
+<!--This form likely needs to be populated with a List<SelectListItem>-->
+<!--This is essentially our Add Prescription form that will lead to creation of a Prescription with the specified Drug-->
+<!--A Prescription should have its DrugName, Tier, and TheDrugPrescribedId to be set at creation-->
+<form method='post' asp-controller='Prescription' asp-action='SelectMeds'>
+    <div class="form-group">
+        <label asp-for='TheDrugPrescribedId'>Choose medication prescribed</label>
+        <select asp-for='TheDrugPrescribedId' asp-items="Model.Drugs"></select>
+    </div>
+    
     <br /><br />
     <input type='submit' value='Submit' />
 </form>
