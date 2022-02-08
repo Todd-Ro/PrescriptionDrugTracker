@@ -137,7 +137,7 @@ namespace PrescriptionDrugTracker.Controllers
         }
 
         [Authorize]
-        public IActionResult ViewUserProfile()
+        public IActionResult ViewUserProfile(string sortpreference="True")
         {
             System.Security.Claims.ClaimsPrincipal currentUser = this.User;
             string currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -152,7 +152,33 @@ namespace PrescriptionDrugTracker.Controllers
             foreach (Expiration e in thisUserPrescriptionsWithExpirations)
             {
                 drugNames.Add(e.DrugName);
-                expiryStrings.Add(e.RefillDueDate.ToString());
+                expiryStrings.Add(e.RefillDueDate.ToString("yyyy-MM(MMM)-dd"));
+            }
+
+            Dictionary<String, String> userDrugInfo = new Dictionary<string, string>();
+            if (sortpreference.Equals("True"))
+            {
+                for(int i = 0; i < drugNames.Count; i++)
+                {
+                    userDrugInfo[expiryStrings[i]] = drugNames[i];
+                }
+                expiryStrings.Sort();
+                for (int i = 0; i < drugNames.Count; i++)
+                {
+                    drugNames[i] = userDrugInfo[expiryStrings[i]];
+                }
+            }
+            else
+            {
+                for (int i = 0; i < drugNames.Count; i++)
+                {
+                    userDrugInfo[drugNames[i]] = expiryStrings[i];
+                }
+                drugNames.Sort();
+                for (int i = 0; i < drugNames.Count; i++)
+                {
+                    expiryStrings[i] = userDrugInfo[drugNames[i]];
+                }
             }
             ViewBag.usermeds = drugNames;
             ViewBag.userexpiries = expiryStrings;
