@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PrescriptionDrugTracker.Models;
+using PrescriptionTracker.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace PrescriptionTracker.Data
     {
         public DbSet<Prescription> PrescriptionSet { get; set; }
         public DbSet<Drug> DrugSet { get; set; }
+        public DbSet<Expiration> ExpirationSet { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

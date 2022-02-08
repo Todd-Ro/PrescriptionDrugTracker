@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using PrescriptionDrugTracker.Models;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace PrescriptionTracker.ViewModels
 {
@@ -10,6 +11,7 @@ namespace PrescriptionTracker.ViewModels
         public string DrugName { get; set; }
         public int Tier { get; set; }
 
+        [Required(ErrorMessage ="Must have identifier for the prescribed drug.")]
         public int TheDrugPrescribedId { get; set; }
 
         public List<SelectListItem> Drugs { get; set; }

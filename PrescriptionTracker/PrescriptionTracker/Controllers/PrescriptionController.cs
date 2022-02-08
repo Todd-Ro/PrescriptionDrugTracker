@@ -1,16 +1,20 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PrescriptionDrugTracker.Models;
 using PrescriptionTracker.Data;
+using PrescriptionTracker.Models;
 using PrescriptionTracker.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace PrescriptionDrugTracker.Controllers
 {
     public class PrescriptionController : Controller
     {
-        List<Drug> AllDrugs;
+        static List<Drug> AllDrugs;
         private ApplicationDbContext pContext;
 
         public PrescriptionController(ApplicationDbContext pDbContext)
@@ -33,18 +37,25 @@ namespace PrescriptionDrugTracker.Controllers
 
 
         //This List ultimately needs to be replaced with the prescriptions for the current user
-        static List<Prescription> SelectedDrugs = new List<Prescription>();
-        static List<int> SelectedDrugIds = new List<int>();
+        //static List<Prescription> SelectedDrugs = new List<Prescription>();
+        //static List<int> SelectedDrugIds = new List<int>();
 
+        [Authorize]
         [HttpGet]
         [HttpPost]
         public IActionResult MySelected(string drugname, string[] drugnames)
         {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            string currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+            
             //TODO: Ensure that only the current user's drugs are included
-            ViewBag.mydruglist = pContext.PrescriptionSet.ToList();
+            ViewBag.mydruglist = pContext.PrescriptionSet
+                .Where(p => p.PatientId.Equals(currentUserId))
+                .ToList();
             return View();
         }
 
+        [Authorize]
         [HttpGet]
         public IActionResult SelectMeds()
         {
@@ -55,6 +66,7 @@ namespace PrescriptionDrugTracker.Controllers
             return View(addPrescriptionViewModel);
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult SelectMeds(Prescription newPrescription, 
             AddPrescriptionViewModel addPrescriptionViewModel)
@@ -66,20 +78,24 @@ namespace PrescriptionDrugTracker.Controllers
                 Drug prescribedDrug = pContext.DrugSet.Find(newPrescription.TheDrugPrescribedId);
                 newPrescription.DrugName = prescribedDrug.DrugName;
                 newPrescription.Tier = prescribedDrug.Tier;
+                System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+                string currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+                newPrescription.PatientId = currentUserId;
 
                 List<Prescription> alreadyPrescribedSameDrug = pContext.PrescriptionSet
                     .Where(presc => presc.TheDrugPrescribedId == newPrescription.TheDrugPrescribedId)
-                    //.Where(presc => presc.PatientId.Equals(newPrescription.PatientId))
+                    .Where(presc => presc.PatientId.Equals(newPrescription.PatientId))
                     .ToList();
 
                 if (alreadyPrescribedSameDrug.Count == 0)
                 {
-                    SelectedDrugs.Add(newPrescription);
-                    SelectedDrugIds.Add(newPrescription.TheDrugPrescribedId);
+                    //SelectedDrugs.Add(newPrescription);
+                    //SelectedDrugIds.Add(newPrescription.TheDrugPrescribedId);
+                    
                     pContext.Add(newPrescription);
                     pContext.SaveChanges();
                 }
-
+                Prescription.NextId = newPrescription.Id + 1;
                 return Redirect("/Prescription/MySelected");
             }
             else
@@ -90,9 +106,10 @@ namespace PrescriptionDrugTracker.Controllers
 
 
 
-        static User DefaultUser = new User();
-        static User CurrentUser = DefaultUser;
+        //static User DefaultUser = new User();
+        //static User CurrentUser = DefaultUser;
 
+        [Authorize]
         [HttpGet]
         [Route("/prescription/setexpiration/{drugname?}")]
         public IActionResult SetExpiration(string drugname)
@@ -101,29 +118,49 @@ namespace PrescriptionDrugTracker.Controllers
             return View();
         }
 
-        //TODO: Check what happens if we try to set duration when already set
+        //TODO: Check what happens if we try to set duration when already set: DONE
+        [Authorize]
         [HttpPost]
         [Route("/prescription/processsetexpiration/{drugname?}")]
         public IActionResult ProcessSetExpiration(string drugname, string lastfilled, int daysoffill)
         {
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            string currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+
             DateTime LastFillDate = ParseDateString(lastfilled);
             DateTime RefillDue = LastFillDate.AddDays(daysoffill);
-            if(!(CurrentUser.Expirations.ContainsKey(drugname)))
-            {
-                CurrentUser.Expirations.Add(drugname, RefillDue);
-            }
-            
+            Expiration newExpiration = new Expiration(drugname, RefillDue, currentUserId); 
+            pContext.ExpirationSet.Add(newExpiration);
+            pContext.SaveChanges();
+
             return Redirect("/Prescription/MySelected");
         }
 
+        [Authorize]
         public IActionResult ViewUserProfile()
         {
-            ViewBag.usermeds = CurrentUser.GetUserMedsWithExpirations();
-            ViewBag.userexpiries = CurrentUser.GetUserMedExpirations();
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            string currentUserId = currentUser.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //TODO: create method for getting currentUserId
+            //TODO: Make less janky
+            List<Expiration> thisUserPrescriptionsWithExpirations =
+                pContext.ExpirationSet
+                .Where(exp => exp.PatientId.Equals(currentUserId))
+                .ToList();
+            List<String> drugNames = new List<String>();
+            List<String> expiryStrings = new List<String>();
+            foreach (Expiration e in thisUserPrescriptionsWithExpirations)
+            {
+                drugNames.Add(e.DrugName);
+                expiryStrings.Add(e.RefillDueDate.ToString());
+            }
+            ViewBag.usermeds = drugNames;
+            ViewBag.userexpiries = expiryStrings;
 
             return View();
         }
 
+        [Authorize]
         public IActionResult SelectMultiple()
         {
             if (AllDrugs is null)
