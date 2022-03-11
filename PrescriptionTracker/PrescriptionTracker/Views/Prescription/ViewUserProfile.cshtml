@@ -8,11 +8,15 @@
     <tr>
         <th>Medicine: </th>
         <th>Supply available until: </th>
+        <th>Days supply remaining:</th>
     </tr>
     @for(int i=0; i<ViewBag.usermeds.Count; i++) {
+        int daysLeft = (ViewBag.userexpirydates[i] - DateTime.Today).Days;
         <tr>
             <th>@ViewBag.usermeds[i] &nbsp;&nbsp;</th>
-            <th>@ViewBag.userexpiries[i]</th>
+            <th style="@(daysLeft <= 0 ? "Background-color:red" : "")">
+                @ViewBag.userexpiries[i]</th>
+            <th>@daysLeft</th>
         </tr>
     }
 </table>

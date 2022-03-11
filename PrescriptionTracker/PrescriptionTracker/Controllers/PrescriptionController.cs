@@ -7,8 +7,10 @@ using PrescriptionTracker.Models;
 using PrescriptionTracker.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 
 namespace PrescriptionDrugTracker.Controllers
 {
@@ -149,10 +151,15 @@ namespace PrescriptionDrugTracker.Controllers
                 .ToList();
             List<String> drugNames = new List<String>();
             List<String> expiryStrings = new List<String>();
+            List<DateTime> expiryDates = new List<DateTime>();
+            DateTimeFormatInfo dtfi = new DateTimeFormatInfo();
+            dtfi.ShortDatePattern = "yyyy-MM(MMM)-dd";
             foreach (Expiration e in thisUserPrescriptionsWithExpirations)
             {
                 drugNames.Add(e.DrugName);
-                expiryStrings.Add(e.RefillDueDate.ToString("yyyy-MM(MMM)-dd"));
+                //The Expiration class has a DateTime field called RefillDueDate.
+                expiryStrings.Add(e.RefillDueDate.ToString(dtfi));
+                expiryDates.Add(e.RefillDueDate);
             }
 
             Dictionary<String, String> userDrugInfo = new Dictionary<string, string>();
@@ -163,6 +170,7 @@ namespace PrescriptionDrugTracker.Controllers
                     userDrugInfo[expiryStrings[i]] = drugNames[i];
                 }
                 expiryStrings.Sort();
+                expiryDates.Sort();
                 for (int i = 0; i < drugNames.Count; i++)
                 {
                     drugNames[i] = userDrugInfo[expiryStrings[i]];
@@ -178,10 +186,13 @@ namespace PrescriptionDrugTracker.Controllers
                 for (int i = 0; i < drugNames.Count; i++)
                 {
                     expiryStrings[i] = userDrugInfo[drugNames[i]];
+                    expiryDates[i] = DateTime.Parse(
+                        RemoveParentheticals(userDrugInfo[drugNames[i]]) );
                 }
             }
             ViewBag.usermeds = drugNames;
             ViewBag.userexpiries = expiryStrings;
+            ViewBag.userexpirydates = expiryDates;
 
             return View();
         }
@@ -216,7 +227,28 @@ namespace PrescriptionDrugTracker.Controllers
         }
 
 
-
+        public static string RemoveParentheticals(string s)
+        {
+            StringBuilder sb = new StringBuilder();
+            int openParens = 0;
+            for(int i=0; i<s.Length; i++)
+            {
+                char c = s[i];
+                if (c == '(')
+                {
+                    openParens++;
+                }
+                else if (c == ')')
+                {
+                    openParens--;
+                }
+                else if (openParens == 0)
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString();
+        }
 
 
     }
